@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAZXP_ & Photography</title>
+    <!-- ดึงฟอนต์ Prompt จาก Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDFBF7;
+            --card-bg: #F7F3EC;
+            --text-main: #3A322C;
+            --text-muted: #7E746C;
+            --accent-gold: #C8A97E;
+            --accent-hover: #B5956A;
+            --border-color: #EADFD5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        nav a:hover, nav a.active-link {
+            color: var(--accent-gold);
+            font-weight: 500;
+        }
+
+        .page-step {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .page-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Photo Wall Background Scroll (เฉพาะหน้าแรก) --- */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 140px 20px;
+            max-width: 100%;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-wall-bg {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transform: rotate(-10deg);
+            opacity: 0.45;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .photo-track {
+            display: flex;
+            gap: 15px;
+            width: max-content;
+        }
+
+        .photo-track.scroll-left {
+            animation: scrollLeft 35s linear infinite;
+        }
+
+        .photo-track.scroll-right {
+            animation: scrollRight 35s linear infinite;
+        }
+
+        .photo-track img {
+            width: 220px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes scrollLeft {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes scrollRight {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.65);
+            padding: 40px 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            max-width: 700px;
+            width: 90%;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+
+        .hero p {
+            color: #e0e0e0;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-gold);
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .portfolio-section {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .portfolio-filter {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--accent-gold);
+            color: #fff;
+            border-color: var(--accent-gold);
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .portfolio-item {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .portfolio-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #E2D9CE;
+        }
+
+        .portfolio-info {
+            padding: 15px;
+        }
+
+        .portfolio-info h3 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .portfolio-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        select, input[type="date"], input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .summary-box {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .total-row {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .time-slot-btn {
+            padding: 10px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .time-slot-btn.selected {
+            background-color: var(--accent-gold);
+            color: #fff;
+            border-color: var(--accent-gold);
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: 40px 0 20px;
+        }
+
+        .nav-step-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        .nav-step-btn:hover {
+            background: var(--card-bg);
+        }
+
+        .page-num-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .page-num-btn.active {
+            background-color: var(--accent-gold);
+            color: #fff;
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 10px rgba(200, 169, 126, 0.3);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            width: 100%;
+            max-width: 450px;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" onclick="goToPage(1)" style="background-color: var(--card-bg); padding: 6px 16px; border-radius: 8px;">KAZXP_</div>
+        <nav>
+            <a id="nav-1" class="active-link" onclick="goToPage(1)">1. หน้าแรก</a>
+            <a id="nav-2" onclick="goToPage(2)">2. ผลงานตัวอย่าง</a>
+            <a id="nav-3" onclick="goToPage(3)">3. คำนวณ & จองคิว</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- หน้าที่ 1: หน้าแรก พร้อม Photo Wall Background เลื่อนไหล -->
+        <section class="page-step active" id="page-1">
+            <div class="hero">
+                <div class="photo-wall-bg">
+                    <!-- แถวที่ 1 เลื่อนซ้าย -->
+                    <div class="photo-track scroll-left">
+                        <img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt=""><img src="858088490_18099974459641459_1023889398664326269_n.jpg" alt=""><img src="DSC00620.jpg" alt=""><img src="DSC00720-2.jpg" alt=""><img src="DSC00729.jpg" alt=""><img src="DSC00760.jpg" alt="">
+                        <img src="DSC00756.jpg" alt=""><img src="DSC01604.jpg" alt=""><img src="DSC01582.jpg" alt=""><img src="สกรีนช็อต 2026-11-01 181237.jpg" alt=""><img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt=""><img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt="">
+                    </div>
+                    <!-- แถวที่ 2 เลื่อนขวา -->
+                    <div class="photo-track scroll-right">
+                        <img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt=""><img src="สกรีนช็อต 2026-11-01 181237.jpg" alt=""><img src="DSC01604.jpg" alt=""><img src="DSC01582.jpg" alt=""><img src="DSC00760.jpg" alt=""><img src="DSC00729.jpg" alt="">
+                        <img src="DSC00620.jpg" alt=""><img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt=""><img src="DSC00720-2.jpg" alt=""><img src="858088490_18099974459641459_1023889398664326269_n.jpg" alt=""><img src="DSC00620.jpg" alt=""><img src="DSC00760.jpg" alt="">
+                    </div>
+                    <!-- แถวที่ 3 เลื่อนซ้าย -->
+                    <div class="photo-track scroll-left">
+                        <img src="810868119_18007467887970482_5675875290280439372_n.jpg" alt=""><img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt=""><img src="DSC01604.jpg" alt=""><img src="DSC00756.jpg" alt=""><img src="DSC00720-2.jpg" alt=""><img src="DSC00620.jpg" alt="">
+                        <img src="DSC00691.jpg" alt=""><img src="DSC00593.jpg" alt=""><img src="810868119_18007467887970482_5675875290280439372_n.jpg" alt=""><img src="DSC00760.jpg" alt=""><img src="DSC01582.jpg" alt=""><img src="DSC01604.jpg" alt="">
+                    </div>
+                    <!-- แถวที่ 4 เลื่อนขวา -->
+                    <div class="photo-track scroll-right">
+                        <img src="DSC00593.jpg" alt=""><img src="DSC00691.jpg" alt=""><img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt=""><img src="DSC00620.jpg" alt=""><img src="DSC01582.jpg" alt=""><img src="DSC00756.jpg" alt="">
+                        <img src="DSC00756.jpg" alt=""><img src="858088490_18099974459641459_1023889398664326269_n.jpg" alt=""><img src="841030398_17990695722027516_2550196328668424357_n.jpg" alt=""><img src="DSC00620.jpg" alt=""><img src="DSC00756.jpg" alt=""><img src="DSC00720-2.jpg" alt="">
+                    </div>
+                </div>
+
+                <div class="hero-content">
+                    <h1>KAZXP_ & Photography</h1>
+                    <p>รับถ่ายภาพนิ่ง ภาพใส่พอร์ต Studio ใช้บริการได้แล้ววันนี้</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn-primary" onclick="goToPage(2)">ดูตัวอย่างผลงาน</button>
+                        <button class="btn-primary" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color);" onclick="goToPage(3)">จองคิวถ่ายภาพ</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- หน้าที่ 2: ผลงานตัวอย่าง (รวม 15 รูป: Portrait 10 รูป / Product 5 รูป) -->
+        <section class="page-step" id="page-2">
+            <div class="portfolio-section">
+                <h2 class="section-title">ผลงานตัวอย่าง</h2>
+                
+                <div class="portfolio-filter">
+                    <button class="filter-btn active" onclick="filterPortfolio('all')">ทั้งหมด (15)</button>
+                    <button class="filter-btn" onclick="filterPortfolio('portrait')">Portrait (10)</button>
+                    <button class="filter-btn" onclick="filterPortfolio('product')">สินค้า (5)</button>
+                </div>
+
+                <div class="portfolio-grid">
+                    <!-- Portrait 1-10 -->
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="841030398_17990695722027516_2550196328668424357_n.jpg" class="portfolio-img" alt="Portrait 1">
+                        <div class="portfolio-info">
+                            <h3>Portrait Minimal 01</h3>
+                            <p>ภาพถ่ายบุคคลโทนคลีนธรรมชาติ</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="858088490_18099974459641459_1023889398664326269_n.jpg" class="portfolio-img" alt="Portrait 2">
+                        <div class="portfolio-info">
+                            <h3>Portrait Warm Tone</h3>
+                            <p>แสงอุ่นละมุน สไตล์สตูดิโอ</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="DSC00620.jpg" class="portfolio-img" alt="Portrait 3">
+                        <div class="portfolio-info">
+                            <h3>Studio Portrait 03</h3>
+                            <p>ถ่ายภาพพอร์ตเทรตบุคคล</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="DSC00720-2.jpg" class="portfolio-img" alt="Portrait 4">
+                        <div class="portfolio-info">
+                            <h3>Natural Light Portrait</h3>
+                            <p>แสงธรรมชาติ คมชัด สวยงาม</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="DSC00729.jpg" class="portfolio-img" alt="Portrait 5">
+                        <div class="portfolio-info">
+                            <h3>Classic Portrait 05</h3>
+                            <p>โทนสีคลาสสิก เหมาะกับทุกโอกาส</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="DSC00760.jpg" class="portfolio-img" alt="Portrait 6">
+                        <div class="portfolio-info">
+                            <h3>Modern Portrait 06</h3>
+                            <p>สไตล์โมเดิร์น เรียบหรู</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="DSC00756.jpg" class="portfolio-img" alt="Portrait 7">
+                        <div class="portfolio-info">
+                            <h3>Soft Focus Portrait</h3>
+                            <p>เน้นความละมุนและเป็นธรรมชาติ</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="DSC01604.jpg" class="portfolio-img" alt="Portrait 8">
+                        <div class="portfolio-info">
+                            <h3>Outdoor Portrait 08</h3>
+                            <p>แสงนอกสตูดิโอ บรรยากาศสบายๆ</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="DSC01582.jpg" class="portfolio-img" alt="Portrait 9">
+                        <div class="portfolio-info">
+                            <h3>Creative Portrait 09</h3>
+                            <p>ไอเดียสร้างสรรค์สไตล์เฉพาะตัว</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="portrait">
+                        <img src="810868119_18007467887970482_5675875290280439372_n.jpg" class="portfolio-img" alt="Portrait 10">
+                        <div class="portfolio-info">
+                            <h3>Signature Portrait 10</h3>
+                            <p>ผลงานพอร์ตเทรตยอดฮิตประจำสตู</p>
+                        </div>
+                    </div>
+
+                    <!-- Product 1-5 -->
+                    <div class="portfolio-item" data-category="product">
+                        <img src="DSC00593.jpg" class="portfolio-img" alt="Product 1">
+                        <div class="portfolio-info">
+                            <h3>Skincare Minimal</h3>
+                            <p>ถ่ายภาพสินค้าเครื่องสำอางคลีนๆ</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="product">
+                        <img src="DSC00691.jpg" class="portfolio-img" alt="Product 2">
+                        <div class="portfolio-info">
+                            <h3>Commercial Product</h3>
+                            <p>ภาพโฆษณา คมชัด น่าดึงดูด</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="product">
+                        <img src="DSC01309.jpg" class="portfolio-img" alt="Product 3">
+                        <div class="portfolio-info">
+                            <h3>Gadget & Accessory</h3>
+                            <p>ภาพถ่ายสินค้าไอทีและอุปกรณ์</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="product">
+                        <img src="DSC00685.jpg" class="portfolio-img" alt="Product 4">
+                        <div class="portfolio-info">
+                            <h3>Lifestyle Product</h3>
+                            <p>สินค้าไลฟ์สไตล์ ใช้งานจริง</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="product">
+                        <img src="DSC00750.jpg" class="portfolio-img" alt="Product 5">
+                        <div class="portfolio-info">
+                            <h3>Studio Product Shot</h3>
+                            <p>จัดไฟสวยงาม เน้นรายละเอียดสินค้า</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- หน้าที่ 3: คำนวณ & จองคิว -->
+        <section class="page-step" id="page-3">
+            <div class="container">
+                <div class="card">
+                    <h2>1. เลือกแพ็กเกจบริการ</h2>
+                    
+                    <div class="form-group">
+                        <label>ประเภทงานถ่ายภาพ</label>
+                        <select id="service-type" onchange="calculatePrice()">
+                            <option value="portrait">ถ่ายภาพ Portrait / บุคคล</option>
+                            <option value="product">ถ่ายภาพสินค้า / รีวิวสินค้า</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>รูปแบบแพ็กเกจ</label>
+                        <select id="package-type" onchange="calculatePrice()">
+                            <option value="promo">โปรโมชั่นเหมา 4 ชั่วโมง (500 บาท)</option>
+                            <option value="hourly">รายชั่วโมง (150 บาท / ชั่วโมง)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="hours-group" style="display: none;">
+                        <label>จำนวนชั่วโมง</label>
+                        <select id="hours-count" onchange="calculatePrice()">
+                            <option value="1">1 ชั่วโมง</option>
+                            <option value="2">2 ชั่วโมง</option>
+                            <option value="3">3 ชั่วโมง</option>
+                            <option value="5">5 ชั่วโมงขึ้นไป</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>บริการเสริมพิเศษ</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="addon-retouch" onchange="calculatePrice()"> แต่งรีทัชผิวพิเศษเพิ่ม ( +200 บาท )
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="addon-express" onchange="calculatePrice()"> ส่งงานด่วนภายใน 24 ชม. ( +150 บาท )
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>2. เลือกวันและเวลา</h2>
+
+                    <div class="form-group">
+                        <label>วันที่ต้องการจอง</label>
+                        <input type="date" id="booking-date">
+                    </div>
+
+                    <div class="form-group">
+                        <label>เลือกรอบเวลาว่าง</label>
+                        <div class="time-slots">
+                            <div class="time-slot-btn" onclick="selectTime(this)">09:00 - 11:00 น.</div>
+                            <div class="time-slot-btn" onclick="selectTime(this)">11:00 - 13:00 น.</div>
+                            <div class="time-slot-btn" onclick="selectTime(this)">13:00 - 15:00 น.</div>
+                            <div class="time-slot-btn" onclick="selectTime(this)">15:00 - 17:00 น.</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span>ค่าบริการหลัก:</span>
+                            <span id="base-price-text">500 บาท</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>ค่าบริการเสริม:</span>
+                            <span id="addon-price-text">0 บาท</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>ยอดรวมสุทธิ:</span>
+                            <span id="total-price-text">500 บาท</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" style="width: 100%; margin-top: 15px;" onclick="openPaymentModal()">ยืนยันการจองคิว & ไปชำระเงิน</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="pagination-container">
+        <button class="nav-step-btn" id="prev-btn" onclick="changePage(-1)" style="visibility: hidden;">&laquo; ย้อนกลับ</button>
+        <button class="page-num-btn active" id="page-btn-1" onclick="goToPage(1)">1</button>
+        <button class="page-num-btn" id="page-btn-2" onclick="goToPage(2)">2</button>
+        <button class="page-num-btn" id="page-btn-3" onclick="goToPage(3)">3</button>
+        <button class="nav-step-btn" id="next-btn" onclick="changePage(1)">ถัดไป &raquo;</button>
+    </div>
+
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePaymentModal()">&times;</span>
+            <h2 style="font-size: 1.3rem; margin-bottom: 10px; text-align: center;">ชำระเงินจองคิว</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">กรุณาสแกน QR Code เพื่อชำระมัดจำ และอัปโหลดสลิป</p>
+            
+            <div class="summary-box" style="margin: 15px 0;">
+                <div class="summary-row">
+                    <span>วันที่จอง:</span>
+                    <strong id="modal-date-text">-</strong>
+                </div>
+                <div class="summary-row">
+                    <span>รอบเวลา:</span>
+                    <strong id="modal-time-text">-</strong>
+                </div>
+                <div class="summary-row">
+                    <span>ราคาทั้งหมด:</span>
+                    <strong id="modal-total-text">0 บาท</strong>
+                </div>
+                <div class="summary-row total-row" style="color: #27ae60;">
+                    <span>ยอดมัดจำที่ต้องชำระ (20%):</span>
+                    <strong id="modal-deposit-text">0 บาท</strong>
+                </div>
+            </div>
+
+            <div style="width: 180px; height: 180px; margin: 15px auto; background-color: #fff; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
+                <img src="สกรีนช็อต 2026-11-07 202321.png" alt="PromptPay QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>อัปโหลดสลิปการโอนเงิน</label>
+                <input type="file" accept="image/*" id="slip-file" style="background: #fff; padding: 8px;">
+            </div>
+
+            <button class="btn-primary" id="confirm-btn" style="width: 100%; margin-top: 10px;" onclick="confirmPayment()">ยืนยันการชำระเงิน</button>
+        </div>
+    </div>
+
+    <div style="background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 40px 20px; text-align: center; margin-top: 40px;">
+        <h3 style="margin-bottom: 15px; color: var(--text-main);">ช่องทางการติดต่อสอบถาม</h3>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem;">เนื่องจากเราพึ่งทำเว็บหลายๆระบบจึงอาจจะยังใช้งานไม่ได้ ถ้าต้องการจองคิวถ่ายรูปสามารถจองคิววันเวลาจ่ายเงินได้ตามปกติแต่ส่งสลิปและวันเวลาจองให้เราในไลน์ด้านล่างนี้ได้เลยครับ
+        </p>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 0.95rem;">
+            <a href="https://instagram.com/kazxp_" target="_blank" style="text-decoration: none; color: var(--accent-gold); font-weight: 500;">📸 Instagram: @kazxp_</a>
+            <a href="https://line.me/ti/p/4vUEgzFD4_" target="_blank" style="text-decoration: none; color: #06C755; font-weight: 500;">💬 Line: @tanapat_kan</a>
+            <span style="color: var(--text-main); font-weight: 500;">📞 Tel: 094-942-9892</span>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 KAZXP_ & Photography. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let currentPage = 1;
+        let selectedTimeSlot = '';
+
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby4CRWcLwnzUwyVapqXH8GiffnVm9f6-MOE9YWihX9MVLdRTVyI1zhHTQSLoCGbDVNA/exec';
+
+        function goToPage(pageNum) {
+            if (pageNum < 1 || pageNum > 3) return;
+            currentPage = pageNum;
+
+            document.querySelectorAll('.page-step').forEach(page => page.classList.remove('active'));
+            document.getElementById(`page-${pageNum}`).classList.add('active');
+
+            document.querySelectorAll('.page-num-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`page-btn-${pageNum}`).classList.add('active');
+
+            document.querySelectorAll('nav a').forEach(nav => nav.classList.remove('active-link'));
+            document.getElementById(`nav-${pageNum}`).classList.add('active-link');
+
+            document.getElementById('prev-btn').style.visibility = (pageNum === 1) ? 'hidden' : 'visible';
+            document.getElementById('next-btn').style.visibility = (pageNum === 3) ? 'hidden' : 'visible';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function changePage(direction) {
+            goToPage(currentPage + direction);
+        }
+
+        function filterPortfolio(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const items = document.querySelectorAll('.portfolio-item');
+            items.forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function calculatePrice() {
+            const packageType = document.getElementById('package-type').value;
+            const hoursGroup = document.getElementById('hours-group');
+            const hoursCount = parseInt(document.getElementById('hours-count').value);
+            
+            let basePrice = 0;
+            if (packageType === 'promo') {
+                hoursGroup.style.display = 'none';
+                basePrice = 500;
+            } else {
+                hoursGroup.style.display = 'block';
+                basePrice = hoursCount * 150;
+            }
+
+            let addonTotal = 0;
+            if (document.getElementById('addon-retouch').checked) addonTotal += 200;
+            if (document.getElementById('addon-express').checked) addonTotal += 150;
+
+            let totalPrice = basePrice + addonTotal;
+
+            document.getElementById('base-price-text').innerText = basePrice + ' บาท';
+            document.getElementById('addon-price-text').innerText = addonTotal + ' บาท';
+            document.getElementById('total-price-text').innerText = totalPrice + ' บาท';
+        }
+
+        function selectTime(element) {
+            document.querySelectorAll('.time-slot-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedTimeSlot = element.innerText;
+        }
+
+        function openPaymentModal() {
+            const date = document.getElementById('booking-date').value;
+            const totalText = document.getElementById('total-price-text').innerText;
+            const totalPrice = parseInt(totalText);
+
+            if (!date) {
+                alert('กรุณาเลือกวันที่ต้องการจองคิวก่อนครับ!');
+                return;
+            }
+            if (!selectedTimeSlot) {
+                alert('กรุณาเลือกรอบเวลาว่างด้วยครับ!');
+                return;
+            }
+
+            const depositPrice = Math.round(totalPrice * 0.2);
+
+            document.getElementById('modal-date-text').innerText = date;
+            document.getElementById('modal-time-text').innerText = selectedTimeSlot;
+            document.getElementById('modal-total-text').innerText = totalText;
+            document.getElementById('modal-deposit-text').innerText = depositPrice + ' บาท';
+
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+        }
+
+        function confirmPayment() {
+            const slipFile = document.getElementById('slip-file').files[0];
+            const confirmBtn = document.getElementById('confirm-btn');
+
+            if (!slipFile) {
+                alert('กรุณาอัปโหลดสลิปการโอนเงินก่อนครับ!');
+                return;
+            }
+
+            confirmBtn.innerText = 'กำลังส่งข้อมูล...';
+            confirmBtn.disabled = true;
+
+            const reader = new FileReader();
+            reader.readAsDataURL(slipFile);
+            reader.onload = function () {
+                const base64Data = reader.result.split(',')[1];
+                
+                const payload = {
+                    serviceType: document.getElementById('service-type').value,
+                    packageType: document.getElementById('package-type').value,
+                    date: document.getElementById('modal-date-text').innerText,
+                    time: document.getElementById('modal-time-text').innerText,
+                    totalPrice: document.getElementById('modal-total-text').innerText,
+                    depositPrice: document.getElementById('modal-deposit-text').innerText,
+                    fileName: slipFile.name,
+                    fileType: slipFile.type,
+                    fileData: base64Data
+                };
+
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('จองคิวและส่งสลิปสำเร็จ! ข้อมูลถูกบันทึกเข้าระบบเรียบร้อยแล้ว');
+                    closePaymentModal();
+                    confirmBtn.innerText = 'ยืนยันการชำระเงิน';
+                    confirmBtn.disabled = false;
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+                    confirmBtn.innerText = 'ยืนยันการชำระเงิน';
+                    confirmBtn.disabled = false;
+                });
+            };
+        }
+
+        calculatePrice();
+    </script>
+</body>
+</html>
